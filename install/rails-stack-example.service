@@ -1,0 +1,24 @@
+# ThAW 2017/09/15 : Make a link in /etc/systemd/system/ (via ln -sf) that points to /var/www/apps/rails-stack-example/install/rails-stack-example.service , then fix the link's SELinux attributes with chcon, then run:
+# $ sudo systemctl daemon-reload
+# $ sudo systemctl enable rails-stack-example.service
+# $ sudo systemctl start rails-stack-example.service
+
+[Unit]
+Description=Rails Stack Example
+Wants=nginx.service postgresql.service
+After=nginx.service postgresql.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+# Restart=always
+User=deployer
+# Group=nginx		# Is this necessary? Apparently not.
+PIDFile=/var/www/apps/rails-stack-example/tmp/pids/rails-stack-example.pid
+WorkingDirectory=/var/www/apps/rails-stack-example
+SyslogIdentifier=rails-stack-example
+ExecStart=/bin/bash -lc 'bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/install/unicorn.rb -E development"'
+# ExecStart=/bin/bash -lc 'bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/install/unicorn.rb -E production"'
+
+[Install]
+WantedBy=multi-user.target

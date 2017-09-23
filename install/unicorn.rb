@@ -2,7 +2,7 @@
 
 # Set the path to the application:
 # app_dir git File.expand_path("../..", __FILE__)
-app_dir = "/var/www/apps/rails-blog"
+app_dir = "/var/www/apps/rails-stack-example"
 log_dir = "#{app_dir}/log"
 tmp_dir = "#{app_dir}/tmp"
 working_directory app_dir
