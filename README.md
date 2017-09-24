@@ -34,9 +34,11 @@ September 18-23, 2017
 
 This "blog" example app is from http://guides.rubyonrails.org/getting_started.html
 
+*** Begin ****
+
 1) Install and configure Fedora 26 LXDE
 	# dnf update
-	# dnf install firefox git
+	# dnf install curl firefox git gpg2
 
 	- Create a non-privileged user named "deployer":
 	# useradd -p [password] deployer
@@ -46,7 +48,6 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 2) Globally install and configure rvm version ?
 	- See https://rvm.io/rvm/install
 
-	- Ensure that bash, curl, and gpg2 are installed
 	# gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
 	# \curl -sSL https://get.rvm.io | bash -s stable --ruby
 	# source /usr/local/rvm/scripts/rvm
@@ -54,6 +55,7 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 	# which ruby
 	# ruby -v
 	# usermod -a -G rvm deployer
+		- Add the user "deployer" to the group "rvm" so that "deployer" can install Ruby gems globally (e.g. when installing the app by running "bundle").
 
 	X Not necessary: Ensure that Bash shells start with the "-l" (login) option
 		- Put a shortcut to LXTerminal on the desktop. Then right-click on it and go to Properties -> Desktop Entry -> Command. Set tis value to: lxterminal -e "bash -il"
@@ -63,7 +65,7 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 		- The default authentication mode is set to 'ident' which means a given Linux user xxx can only connect as the postgres user xxx. 
 
 	# dnf install postgresql postgresql-server
-	- Install the package needed to build the Ruby gem "pg" :
+	- Install the package needed to build the Ruby gem "pg", which will be used by the Rails app to access the PostgreSQL database:
 		- Fedora: # dnf install postgresql-devel
 		- Ubuntu: # apt-get install libpq-dev
 	
@@ -120,14 +122,14 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 4) Install and configure Unicorn version ?
 	# gem install unicorn
 
-5) Install and configure the Ruby and Rails application (the "blog" app from the Rails "Getting Started page:  )
+5) Install and configure the Ruby and Rails application (the "blog" app from the Rails "Getting Started" page: http://guides.rubyonrails.org/getting_started.html )
 	# gem install bundler
 	$ cd /var/www/apps/rails-stack-example
 	Not necessary? : $ chgrp -R rvm .
 	$ bundle
 	$ rake db:migrate
 	$ rails server
-	- Browse to localhost:3000 and smoke-test the app.
+	- Browse to http://localhost:3000 and smoke-test the app.
 
 	$ sudo -i
 	# chown -R deployer:deployer /var/www/apps/rails-stack-example/
@@ -135,7 +137,7 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 	$ unicorn -c /var/www/apps/rails-stack-example/install/unicorn.rb -E development (-D)
 		- Or: $ bin/bundle exec "unicorn -c /var/www/apps/rails-stack-example/install/unicorn.rb -E development (-D)"
 
-6) Install and configure nginx version ?
+6) Install and configure nginx version 1.12.1
 	# dnf install nginx
 	- The Unicorn process launched by rails-stack-example.service will run as the user "deployer", who must be a member of the "nginx" group.
 	# usermod -a -G nginx deployer
@@ -143,8 +145,13 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 	# mv nginx.conf nginx_original.conf
 	# ln -sf /var/www/apps/rails-stack-example/install/nginx.conf
 	# ls -lZ nginx*
-	# chcon -h -u system_u nginx.conf
+	# chcon -h -u system_u -t httpd_config_t nginx.conf
 	# chcon -u system_u -t httpd_config_t nginx.conf
+
+	- Ensure that the statically-served assets in "public" are readable by nginx:
+	# chmod -R +x /var/www/apps/rails-stack-example/public
+	# chcon -Rt httpd_sys_content_t /var/www/apps/rails-stack-example/public
+		- See https://thecruskit.com/fixing-403-errors-when-using-nginx-with-selinux/
 
 	As deployer: $ chgrp -R nginx /var/www/apps/rails-stack-example/tmp/sockets/
 		- The .sock file, must be readable and writable by user deployer and group nginx.
@@ -176,10 +183,12 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 		- "# systemctl enable ..." creates symlinks in /etc/systemd/system/multi-user.target.wants/
 	# cd /etc/systemd/system
 	# ln -sf /var/www/apps/rails-stack-example/install/rails-stack-example.service
-	# chcon -h -u system_u rails-stack-example.service
+	# chcon -h -u system_u -t systemd_unit_file_t rails-stack-example.service
 	# chcon -u system_u -t systemd_unit_file_t rails-stack-example.service
 	# systemctl daemon-reload
 	# systemctl enable rails-stack-example.service
 	# systemctl status rails-stack-example.service
 	# systemctl start rails-stack-example.service
 	# systemctl status rails-stack-example.service
+
+*** End ***
