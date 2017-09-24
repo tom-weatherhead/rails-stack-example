@@ -8,13 +8,28 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.3'
+
+### Database
+
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+# gem 'sqlite3'
+
+# The pg gem provides an interface to PostgreSQL databases.
+# See https://rubygems.org/gems/pg
+# See https://github.com/ged/ruby-pg
+# Before running "bundle", do this: sudo apt-get install libpq-dev
+gem 'pg'
+
+### App Server
+
 # Use Puma as the app server
-gem 'puma', '~> 3.7'
+# gem 'puma', '~> 3.7'
+
+# Use Unicorn as the app server
+gem 'unicorn'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -36,6 +51,12 @@ gem 'jbuilder', '~> 2.5'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+group :development do
+  gem 'capistrano'
+  gem 'capistrano-rails'
+  gem 'capistrano-rvm'
+end
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -55,11 +76,3 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-# The pg gem provides an interface to PostgreSQL databases.
-# See https://rubygems.org/gems/pg
-# See https://github.com/ged/ruby-pg
-# Before running "bundle", do this: sudo apt-get install libpq-dev
-gem 'pg'
-
-gem 'unicorn'

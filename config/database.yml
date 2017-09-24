@@ -1,26 +1,38 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  username: deployer
-  password: password
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
 
-development:
+###
+
+devTemplate: &devTemplate
   <<: *default
+  username: tomw
+  password: tomtom7
+
+prodTemplate: &prodTemplate
+  <<: *default
+  username: deployer
+  password: password
+
+###
+
+development:
+  <<: *devTemplate
   database: rails_stack_example_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
+  <<: *devTemplate
   database: rails_stack_example_test
 
 staging:
-  <<: *default
+  <<: *prodTemplate
   database: rails_stack_example_staging
 
 production:
-  <<: *default
+  <<: *prodTemplate
   database: rails_stack_example_production

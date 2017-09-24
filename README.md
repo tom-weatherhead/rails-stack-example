@@ -128,6 +128,7 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 	Not necessary? : $ chgrp -R rvm .
 	$ bundle
 	$ rake db:migrate
+	$ RAILS_ENV=test rake db:migrate
 	$ rails server
 	- Browse to http://localhost:3000 and smoke-test the app.
 
@@ -142,7 +143,7 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 	- The Unicorn process launched by rails-stack-example.service will run as the user "deployer", who must be a member of the "nginx" group.
 	# usermod -a -G nginx deployer
 	# cd /etc/nginx
-	# mv nginx.conf nginx_original.conf
+	# mv nginx.conf nginx.original.conf
 	# ln -sf /var/www/apps/rails-stack-example/install/nginx.conf
 	# ls -lZ nginx*
 	# chcon -h -u system_u -t httpd_config_t nginx.conf
