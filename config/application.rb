@@ -7,7 +7,7 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 
 # See https://codereview.stackexchange.com/questions/144435/set-env-variables-for-ruby-on-rails :
-SECRETS = Rails.application.secrets
+# SECRETS = Rails.application.secrets
 
 module Blog
   class Application < Rails::Application
