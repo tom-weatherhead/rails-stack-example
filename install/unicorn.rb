@@ -2,9 +2,11 @@
 
 # Set the path to the application:
 # app_dir git File.expand_path("../..", __FILE__)
-app_dir = "/var/www/apps/rails-stack-example"
+# app_dir = "/var/www/apps/rails-stack-example"
+app_dir = "/var/www/apps/rails-stack-example/current"
 log_dir = "#{app_dir}/log"
-tmp_dir = "#{app_dir}/tmp"
+# tmp_dir = "#{app_dir}/tmp"
+tmp_dir = "#{app_dir}/shared/tmp"
 working_directory app_dir
 
 # Set the Unicorn options:

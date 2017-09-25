@@ -10,6 +10,7 @@ set :branch, "master"
 
 # Default deploy_to directory is /var/www/my_app_name
 # set :deploy_to, "/var/www/my_app_name"
+set :deploy_to, "/var/www/apps/rails-stack-example"
 
 # Default value for :format is :airbrussh.
 # set :format, :airbrussh
@@ -22,7 +23,7 @@ set :branch, "master"
 # set :pty, true
 
 # Default value for :linked_files is []
-append :linked_files, "config/database.yml", "config/secrets.yml"
+# append :linked_files, "config/database.yml", "config/secrets.yml"
 # set :linked_files, fetch(:linked_files, []).push('config/database.yml', 'config/secrets.yml')
 
 # Default value for linked_dirs is []
