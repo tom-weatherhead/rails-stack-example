@@ -10,8 +10,7 @@ set :stage, :production
 # server "db.example.com", user: "deploy", roles: %w{db}
 
 # server '123.45.67.89', user: 'root', roles: %w{app web db}
-# server "192.168.119.153", user: "deployer", roles: %w{app web db}
-server "Caritas", user: "deployer", roles: %w{app web db}
+server "192.168.12.127", user: "deployer", roles: %w{app web db}
 
 # role-based syntax
 # ==================
@@ -25,9 +24,9 @@ server "Caritas", user: "deployer", roles: %w{app web db}
 # role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
 
-role :app, %w{deployer@192.168.119.153}
-role :web, %w{deployer@192.168.119.153}
-role :db, %w{deployer@192.168.119.153}
+role :app, %w{deployer@192.168.12.127}
+role :web, %w{deployer@192.168.12.127}
+role :db, %w{deployer@192.168.12.127}
 
 
 # Configuration

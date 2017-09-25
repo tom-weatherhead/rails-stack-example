@@ -19,8 +19,9 @@ WorkingDirectory=/var/www/apps/rails-stack-example/current
 SyslogIdentifier=rails-stack-example
 # ExecStart=/bin/bash -lc '/path/to/start_unicorn_rails.sh'" # ??? This script can set the Rails environment via: ... -E $RAILS_ENV
 # ExecStart=/bin/bash -lc 'bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/current/install/unicorn.rb -E development"'
-ExecStart=/bin/bash -lc 'bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/current/install/unicorn.rb -E staging"'
+# ExecStart=/bin/bash -lc 'bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/current/install/unicorn.rb -E staging"'
 # ExecStart=/bin/bash -lc 'bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/current/install/unicorn.rb -E production"'
+ExecStart=/bin/bash -lc '/var/www/apps/rails-stack-example/current/install/start-unicorn-service.sh'
 
 [Install]
 WantedBy=multi-user.target
