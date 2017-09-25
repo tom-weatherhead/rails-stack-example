@@ -6,6 +6,9 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# See https://codereview.stackexchange.com/questions/144435/set-env-variables-for-ruby-on-rails :
+SECRETS = Rails.application.secrets
+
 module Blog
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
