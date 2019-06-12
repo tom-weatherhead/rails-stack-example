@@ -19,4 +19,5 @@ esac
 
 echo "RAILS_ENV is $RAILS_ENV"
 
-bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/current/install/unicorn.rb -E $RAILS_ENV"
+echo "unicorn_rails -D -c /var/www/apps/rails-stack-example/current/install/unicorn.rb -E $RAILS_ENV"
+# bundle exec "unicorn_rails -D -c /var/www/apps/rails-stack-example/current/install/unicorn.rb -E $RAILS_ENV"
