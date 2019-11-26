@@ -34,6 +34,83 @@ September 18-23, 2017
 
 This "blog" example app is from http://guides.rubyonrails.org/getting_started.html
 
+# apt update
+# apt -y dist-upgrade
+# apt -y autoremove
+
+- Install rvm:
+	$ sudo gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB (Is sudo really required here?)
+	$ \curl -sSL https://get.rvm.io | sudo bash -s stable
+	# usermod -a -G rvm tomw
+	# usermod -a -G rvm root
+	Log out of root and tomw, then log back in to tomw and then to root.
+	# rvm install 2.6.3 (2.6.3 is the latest stable version as of the time of writing)
+	(# rvm --default use 2.6.3) (Not necessary in this case)
+	Log out of root and tomw, then log back in to tomw and then to root.
+	# gem install bundler
+
+- Install Postgres: # apt install postgres
+	# systemctl status postgresql
+	$ sudo -u postgres psql
+		postgres=# \password (Change the password for the Postgres account named 'postgres')
+		postgres=# CREATE USER "deployer" WITH SUPERUSER PASSWORD '[password]';
+
+			- See https://dba.stackexchange.com/questions/146087/postgresql-cannot-login-with-created-users
+			! Do not confuse the PostgreSQL user named "deployer" with the Linux user named "deployer".
+	(BEGIN Old Text)
+		postgres=# create user tomw with password 'secret'; (substitute a real password for 'secret')
+		postgres=# grant postgres to tomw; (grant the privileges associated with the role 'postgres' to tomw)
+		postgres=# create database testdb owner tomw;
+		postgres=# \q (this quits psql)
+	- Test tomw's access to psql:
+		$ psql -W testdb tomw (or, if the current Ubuntu user is tomw, just this: $ psql -W testdb)
+			postgres=# \q
+	(END Old Text)
+	? Switch from "ident" authentication to "md5" in /var/lib/pgsql/9.4/data/pg_hba.conf; replace the following lines:
+		- local  all             all                   peer  (local: for Unix domain socket connections only)
+		- host   all             all  127.0.0.1/32     ident (IPv4)
+		- host   all             all  ::1/128          ident (IPv6)
+	... with these:
+		- local  all             all                   md5   (local)
+		- host   all             all  127.0.0.1/32     md5   (IPv4)
+		- host   all             all  ::1/128          md5   (IPv6)
+	? gem install pg -v '0.17.1' -- --with-pg-config=/usr/pgsql-9.4/bin/pg_config
+	# apt install libpq-dev (to avoid problems with the pq gem)
+	postgres=# CREATE DATABASE "rails_stack_example_development" OWNER "deployer";
+	postgres=# CREATE DATABASE "rails_stack_example_test" OWNER "deployer";
+	postgres=# CREATE DATABASE "rails_stack_example_staging" OWNER "deployer";
+	postgres=# CREATE DATABASE "rails_stack_example_production" OWNER "deployer";
+	postgres=# \q
+
+	- Test deployer's ability to access the databases:
+	
+	# su - deployer
+	$ psql -d rails_stack_example_development
+
+	deployer=# \q
+
+	$ psql -d rails_stack_example_test
+
+	deployer=# \q
+
+	$ psql -d rails_stack_example_staging
+
+	deployer=# \q
+
+	$ psql -d rails_stack_example_production
+
+	deployer=# \q
+
+- Testing in the dev environment:
+	$ bundle
+	- Run the Rails dev server Webrick bound to IP addr e.g. 192.168.56.103: $ rails s -b 192.186.56.103 (add -d to run as a daemon)
+
+- Install Unicorn: # gem install unicorn
+
+- Install nginx: # apt install nginx
+
+---- Old material for Fedora is below this line ----
+
 *** Begin ****
 
 1) Install and configure Fedora 26 LXDE
@@ -62,21 +139,32 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 
 3) Install and configure PostgreSQL version 9.6.4-1.fc26.x86_64
 	- See https://wiki.postgresql.org/wiki/First_steps
-		- The default authentication mode is set to 'ident' which means a given Linux user xxx can only connect as the postgres user xxx.
+		- The default authentication mode is set to 'ident' which means a given Linux user xxx can only connect as the postgres user xxx. 
 
-	- If there is an existing PostgreSQL data directory, blow it away. Hint: Look for /usr/local/var/postgres
+	# dnf install postgresql postgresql-server
+	- Install the package needed to build the Ruby gem "pg", which will be used by the Rails app to access the PostgreSQL database:
+		- Fedora: # dnf install postgresql-devel
+		- Ubuntu: # apt-get install libpq-dev
+	
+	X Not necessary when using 'ident' authentication: Edit the pg_hba.conf file:
+		- In /etc/postgresql/9.5/main/pg_hba.conf (Windows: C:\PostgreSQL\data\pg_hba.conf), change:
 
-	# Install PostgreSQL
-	$ brew install postgresql
+		# IPv4 local connections:
+		host    all             all             127.0.0.1/32            md5
 
-	# Initialize PostgreSQL's data directory
-	$ initdb -D /usr/local/var/postgres/data -U postgres
+		... to:
 
-	# Start the PostgreSQL server
-	$ pg_ctl -D /usr/local/var/postgres/data -l logfile start
+		# IPv4 local connections:
+		host    all             all             127.0.0.1/32            trust
 
-	# Connect to the database 'postgres' as the current user
-	$ psql -d postgres
+	# su - postgres
+	$ initdb
+	$ exit
+	# systemctl status postgresql.service
+	# systemctl (re)start postgresql.service
+	- Ensure that the service starts at boot time: # systemctl enable postgresql.service
+	# su - postgres
+	$ psql
 
 	postgres=# CREATE USER "deployer" WITH SUPERUSER PASSWORD '[password]';
 
@@ -91,19 +179,20 @@ This "blog" example app is from http://guides.rubyonrails.org/getting_started.ht
 
 	- Test deployer's ability to access the databases:
 	
-	$ psql -d rails_stack_example_development -U deployer
+	# su - deployer
+	$ psql -d rails_stack_example_development
 
 	deployer=# \q
 
-	$ psql -d rails_stack_example_test -U deployer
+	$ psql -d rails_stack_example_test
 
 	deployer=# \q
 
-	$ psql -d rails_stack_example_staging -U deployer
+	$ psql -d rails_stack_example_staging
 
 	deployer=# \q
 
-	$ psql -d rails_stack_example_production -U deployer
+	$ psql -d rails_stack_example_production
 
 	deployer=# \q
 
